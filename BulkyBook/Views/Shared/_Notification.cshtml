@@ -1,0 +1,22 @@
+﻿
+@if (TempData["SuccessMessage"] != null || TempData["ErrorMessage"] != null)
+{
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script type="text/javascript">
+        toastr.options.closeButton = true;
+        toastr.options.progressBar = true;
+    </script>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <script type="text/javascript">
+        toastr.success('@TempData["SuccessMessage"]');
+    </script>
+}
+else if (TempData["ErrorMessage"] != null)
+{
+    <script type="text/javascript">
+        toastr.error('@TempData["ErrorMessage"]');
+    </script>
+}
