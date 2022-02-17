@@ -1,4 +1,5 @@
 ﻿using BulkyBook.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Linq.Expressions;
 
 namespace BulkyBook.DataAccess.Repository.IRepository
@@ -8,5 +9,7 @@ namespace BulkyBook.DataAccess.Repository.IRepository
         bool Exists(Expression<Func<CoverType, bool>> filter);
 
         void Update(CoverType coverType);
+
+        IEnumerable<SelectListItem> GetCoverTypeListForDropDown();
     }
 }

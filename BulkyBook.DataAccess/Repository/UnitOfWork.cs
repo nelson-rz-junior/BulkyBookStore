@@ -11,12 +11,15 @@ namespace BulkyBook.DataAccess.Repository
 
         public ICoverTypeRepository CoverTypeRepository { get; private set; }
 
+        public IProductRepository ProductRepository { get; private set; }
+
         public UnitOfWork(ApplicationDbContext context)
         {
             _context = context;
 
             CategoryRepository = new CategoryRepository(_context);
             CoverTypeRepository = new CoverTypeRepository(_context);
+            ProductRepository = new ProductRepository(_context);
         }
 
         public async Task SaveChangesAsync()

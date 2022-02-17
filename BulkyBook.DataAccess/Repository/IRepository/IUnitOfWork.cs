@@ -6,6 +6,8 @@
 
         ICoverTypeRepository CoverTypeRepository { get; }
 
+        IProductRepository ProductRepository { get; }
+
         Task SaveChangesAsync();
     }
 }

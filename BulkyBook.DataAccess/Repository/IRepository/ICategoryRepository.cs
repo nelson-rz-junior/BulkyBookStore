@@ -1,4 +1,5 @@
 ﻿using BulkyBook.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Linq.Expressions;
 
 namespace BulkyBook.DataAccess.Repository.IRepository
@@ -8,5 +9,7 @@ namespace BulkyBook.DataAccess.Repository.IRepository
         bool Exists(Expression<Func<Category, bool>> filter);
 
         void Update(Category category);
+
+        IEnumerable<SelectListItem> GetCategoryListForDropDown();
     }
 }
