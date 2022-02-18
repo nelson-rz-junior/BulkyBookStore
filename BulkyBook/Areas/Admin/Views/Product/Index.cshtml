@@ -11,10 +11,11 @@
             <a asp-controller="Product" asp-action="Upsert" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> &nbsp; New Product
             </a>
-        </div>                    
+        </div>
+        <hr />
     </div>
 
-    <table class="table table-bordered table-striped mt-3" style="width:100%;">
+    <table id="products" class="table table-bordered table-striped mt-3" style="width:100%;">
         <thead>
             <tr>
                 <th>Id</th>
@@ -26,12 +27,12 @@
                 <th></th>
             </tr>
         </thead>
-        <tbody>
-        </tbody>
+        <tbody></tbody>
     </table>
 </div>
 
 @section Scripts
 {
     <partial name="_Notification" />
+    <script src="~/js/listProduct.js" asp-append-version="true"></script>
 }

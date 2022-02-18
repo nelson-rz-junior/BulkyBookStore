@@ -45,15 +45,15 @@ namespace BulkyBook.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Upsert(ProductVM productVM, IFormFile? file)
+        public async Task<IActionResult> Upsert(ProductVM productVM, IFormFile? fileUpload)
         {
             if (ModelState.IsValid)
             {
-                if (file != null)
+                if (fileUpload != null)
                 {
                     byte[] image = null;
 
-                    using (var fs = file.OpenReadStream())
+                    using (var fs = fileUpload.OpenReadStream())
                     {
                         using var ms = new MemoryStream();
 
@@ -90,39 +90,40 @@ namespace BulkyBook.Areas.Admin.Controllers
             return View(productVM);
         }
 
-        public async Task<IActionResult> Delete(int? id)
+        #region API Calls
+
+        [HttpGet("api/products")]
+        public async Task<IActionResult> GetProductsDT()
         {
-            if (!id.HasValue || id == 0)
+            return Json(new
             {
-                return NotFound();
-            }
-
-            var product = await _unitOfWork.ProductRepository.GetFirstOrDefaultAsync(c => c.Id == id.Value);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
+                data = await _unitOfWork.ProductRepository.GetProductsDT()
+            });
         }
 
-        [HttpPost]
-        [ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeletePost(int? id)
+        [HttpDelete("api/[controller]/{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
             var product = await _unitOfWork.ProductRepository.GetFirstOrDefaultAsync(c => c.Id == id);
             if (product == null)
             {
-                return NotFound();
+                return Json(new
+                {
+                    success = false,
+                    message = "Product was not found"
+                });
             }
 
             _unitOfWork.ProductRepository.Remove(product);
             await _unitOfWork.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = $"Product #{id} deleted successfully";
-
-            return RedirectToAction(nameof(Index));
+            return Json(new
+            {
+                success = true,
+                message = "Product deleted successfully"
+            });
         }
+
+        #endregion
     }
 }

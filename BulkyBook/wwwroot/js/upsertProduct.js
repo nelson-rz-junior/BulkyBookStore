@@ -47,7 +47,7 @@
 }
 
 function validateImage() {
-    if ($("#Product_Image").val() === "") {
+    if ($("#fileUpload").val() === "") {
         Swal.fire({
             icon: 'warning',
             title: 'Oops...',
@@ -72,3 +72,24 @@ function setPricesMask() {
         }
     });
 }
+
+function setTinyMce() {
+    tinymce.init({
+        selector: 'textarea',
+        plugins: 'lists',
+        menubar: 'file edit format'
+    });
+}
+
+$(document).ready(function () {
+    setTinyMce();
+    setPricesMask();
+
+    $("#btnCreateProduct").click(function () {
+        return validateImage() && validatePrices();
+    });
+
+    $("#btnUpdateProduct").click(function () {
+        return validatePrices();
+    });
+});

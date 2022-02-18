@@ -1,6 +1,8 @@
 ﻿using BulkyBook.DataAccess.Context;
 using BulkyBook.DataAccess.Repository.IRepository;
 using BulkyBook.Models;
+using BulkyBook.Models.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace BulkyBook.DataAccess.Repository
 {
@@ -11,6 +13,22 @@ namespace BulkyBook.DataAccess.Repository
         public ProductRepository(ApplicationDbContext context) : base(context)
         {
             _context = context;
+        }
+
+        public async Task<IEnumerable<ProductDT>> GetProductsDT()
+        {
+            return await _context.Products
+                .Include(p => p.Category)
+                .Select(p => new ProductDT
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    Author = p.Author,
+                    ISBN = p.ISBN,
+                    Price = p.Price,
+                    CategoryName = p.Category.Name
+                })
+                .ToListAsync();
         }
 
         public void Update(Product product)

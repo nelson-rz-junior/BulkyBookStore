@@ -24,7 +24,7 @@
         </div>
         <div class="mb-3">
             <label asp-for="Product.Description"></label>
-            <textarea asp-for="Product.Description" class="form-control" rows="5" ></textarea>
+            <textarea asp-for="Product.Description" class="form-control" rows="15" ></textarea>
             <span asp-validation-for="Product.Description" class="text-danger"></span>
         </div>
         <div class="mb-3 col-6">
@@ -61,7 +61,7 @@
         </div>
         <div class="mb-3 col-6">
             <label asp-for="Product.Image"></label>
-            <input type="file" name="file" class="form-control" />
+            <input type="file" id="fileUpload" name="fileUpload" class="form-control" />
         </div>
         <div class="mb-4 mt-4 col-6 text-center">
             @if (Model.Product.Image != null)
@@ -105,19 +105,5 @@
 @section Scripts
 {
     <partial name="_ValidationScriptsPartial" />
-
-    <script src="~/js/product.js" asp-append-version="true"></script>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            setPricesMask();
-
-            $("#btnCreateProduct").click(function() {
-                return validateImage() && validatePrices();
-            });
-
-            $("#btnUpdateProduct").click(function() {
-                return validatePrices();
-            });
-        });
-    </script>
+    <script src="~/js/upsertProduct.js" asp-append-version="true"></script>
 }

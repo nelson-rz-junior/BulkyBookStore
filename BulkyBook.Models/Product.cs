@@ -22,12 +22,13 @@ namespace BulkyBook.Models
         [Display(Name = "List Price")]
         public decimal ListPrice { get; set; }
 
+        [Display(Name = "Price for 1-50")]
         public decimal Price { get; set; }
 
-        [Display(Name = "Price 50")]
+        [Display(Name = "Price for 51-100")]
         public decimal Price50 { get; set; }
 
-        [Display(Name = "Price 100")]
+        [Display(Name = "Price for 100+")]
         public decimal Price100 { get; set; }
 
         public byte[] Image { get; set; }

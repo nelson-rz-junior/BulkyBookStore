@@ -1,12 +1,13 @@
-﻿using System.Linq.Expressions;
+﻿#nullable disable
+using System.Linq.Expressions;
 
 namespace BulkyBook.DataAccess.Repository.IRepository
 {
     public interface IRepository<T> where T : class
     {
-        Task<T> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter);
+        Task<T> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter, string includeProperties = null);
 
-        Task<IEnumerable<T>> GetAllAsync();
+        Task<IEnumerable<T>> GetAllAsync(string includeProperties = null);
 
         Task AddAsync(T entity);
 

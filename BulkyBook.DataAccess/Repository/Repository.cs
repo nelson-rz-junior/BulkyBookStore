@@ -18,9 +18,18 @@ namespace BulkyBook.DataAccess.Repository
             dbSet = _context.Set<T>();
         }
 
-        public async Task<T> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter)
+        public async Task<T> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter, string includeProperties = null)
         {
             IQueryable<T> query = dbSet;
+
+            if (includeProperties != null)
+            {
+                string[] properties = includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var property in properties)
+                {
+                    query = query.Include(property);
+                }
+            }
 
             if (filter != null)
             {
@@ -30,9 +39,20 @@ namespace BulkyBook.DataAccess.Repository
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllAsync(string includeProperties = null)
         {
-            return await dbSet.ToListAsync();
+            IQueryable<T> query = dbSet;
+
+            if (includeProperties != null)
+            {
+                string[] properties = includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var property in properties)
+                {
+                    query = query.Include(property);
+                }
+            }
+
+            return await query.ToListAsync();
         }
 
         public async Task AddAsync(T entity)
