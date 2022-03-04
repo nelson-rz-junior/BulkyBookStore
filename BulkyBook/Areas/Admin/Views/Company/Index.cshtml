@@ -1,0 +1,38 @@
+﻿@{
+    ViewData["Title"] = "Companies";
+}
+
+<div class="p-3">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h3 class="text-primary">Companies</h3>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="Company" asp-action="Upsert" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> &nbsp; New Company
+            </a>
+        </div>
+        <hr />
+    </div>
+
+    <table id="companies" class="table table-bordered table-striped mt-3" style="width:100%;">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Address</th>
+                <th>City</th>
+                <th>State</th>
+                <th>Phone Number</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+@section Scripts
+{
+    <partial name="_Notification" />
+    <script src="~/js/company.js" asp-append-version="true"></script>
+}

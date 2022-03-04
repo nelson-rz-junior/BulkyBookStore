@@ -13,6 +13,8 @@ namespace BulkyBook.DataAccess.Repository
 
         public IProductRepository ProductRepository { get; private set; }
 
+        public ICompanyRepository CompanyRepository { get; private set; }
+
         public UnitOfWork(ApplicationDbContext context)
         {
             _context = context;
@@ -20,6 +22,7 @@ namespace BulkyBook.DataAccess.Repository
             CategoryRepository = new CategoryRepository(_context);
             CoverTypeRepository = new CoverTypeRepository(_context);
             ProductRepository = new ProductRepository(_context);
+            CompanyRepository = new CompanyRepository(_context);
         }
 
         public async Task SaveChangesAsync()

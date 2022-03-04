@@ -19,6 +19,8 @@ namespace BulkyBook.DataAccess.Context
 
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
+        public DbSet<Company> Companies { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Product>().Property(p => p.ListPrice).HasColumnType("decimal(7,2)");
