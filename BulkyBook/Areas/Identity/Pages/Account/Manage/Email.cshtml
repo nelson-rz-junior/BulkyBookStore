@@ -28,7 +28,7 @@
                 <div class="form-floating">
                     <input asp-for="Email" class="form-control" disabled />
                     <label asp-for="Email" class="form-label"></label>
-                    <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="w-100 btn btn-lg btn-success my-3">Send verification e-mail</button>
+                    <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="w-100 btn btn-success my-3">Send verification e-mail</button>
                 </div>
             }
             <div class="form-floating">
@@ -36,7 +36,7 @@
                 <label asp-for="Input.NewEmail" class="form-label"></label>
                 <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
             </div>
-            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="w-100 btn btn-lg btn-primary mt-3">Change e-mail</button>
+            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="w-100 btn btn-primary mt-3">Change e-mail</button>
         </form>
     </div>
 </div>
