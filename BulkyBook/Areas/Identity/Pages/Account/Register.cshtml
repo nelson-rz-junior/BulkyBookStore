@@ -67,6 +67,7 @@
                     <option selected disable value="">--- Select a company ---</option>
                 </select>
                 <label asp-for="Input.CompanyId" class="form-label"></label>
+                <span id="errorCompanyId" class="text-danger"></span>
             </div>
             <div class="form-floating py-2">
                 <button id="registerSubmit" type="submit" class="w-100 btn btn-primary mt-3">Register</button>
@@ -110,15 +111,37 @@
     <partial name="_ValidationScriptsPartial" />
     <script type="text/javascript">
         $(document).ready(function() {
-            $("#Input_Role").change(function() {
-                let selectedValue = $("#Input_Role option:selected").text();
-                if (selectedValue.toLowerCase() !== "company") {
-                    $("#selectCompany").hide();
+            let inputCompanyId = $("#Input_CompanyId");
+            let inputErrorCompanyId = $("#errorCompanyId");
+            let selectCompany = $("#selectCompany");
+
+            function validateCompanyId() {
+                let roleSelectedValue = $("#Input_Role option:selected").text();
+                if (roleSelectedValue.toLowerCase() === "company" && inputCompanyId.val() === "") {
+                    inputErrorCompanyId.text("The company is required");
                 }
                 else {
-                    $("#selectCompany").show();
+                    inputErrorCompanyId.text("");
                 }
-            })
+            }
+
+            $("#Input_Role").change(function() {
+                let roleSelectedValue = $("#Input_Role option:selected").text();
+                if (roleSelectedValue.toLowerCase() !== "company") {
+                    selectCompany.hide();
+                }
+                else {
+                    selectCompany.show();
+                }
+            });
+
+            inputCompanyId.change(function() {
+                validateCompanyId();
+            });
+
+            $("#registerSubmit").click(function() {
+                validateCompanyId();
+            });
         });
     </script>
 }
