@@ -39,7 +39,7 @@ namespace BulkyBook.DataAccess.Repository
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync(string includeProperties = null)
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> filter = null, string includeProperties = null)
         {
             IQueryable<T> query = dbSet;
 
@@ -50,6 +50,11 @@ namespace BulkyBook.DataAccess.Repository
                 {
                     query = query.Include(property);
                 }
+            }
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
             }
 
             return await query.ToListAsync();

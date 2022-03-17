@@ -1,11 +1,11 @@
-﻿@model BulkyBook.Models.ViewModels.ShoppingCart
+﻿@model BulkyBook.Models.ShoppingCart
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Product Details";
 }
 
 <form method="post">
-    <input hidden asp-for="Product.Id" />
+    <input hidden asp-for="Product" />
     <div class="card container pt-4">
         <div class="card-header bg-primary text-light ml-0 row">
             <div class="col-12 col-md-6">
@@ -32,10 +32,10 @@
                                 <div>Quantity</div>
                             </div>
                             <div class="p-1 col-2 bg-light border-bottom">
-                                <div>1-50</div>
+                                <div>1-49</div>
                             </div>
                             <div class="p-1 col-2 bg-light border-bottom">
-                                <div>51-100</div>
+                                <div>50-99</div>
                             </div>
                             <div class="p-1 col-2 bg-light border-bottom">
                                 <div>100+</div>
@@ -80,7 +80,7 @@
         <div class="card-footer">
             <div class="row">
                 <div class="col-12 col-md-6 pb-1">
-                    <a class="btn btn-success form-control" style="height:50px;padding-top:12px;" asp-action="Index">Back to Home</a>
+                    <a class="btn btn-success form-control" style="height:50px;padding-top:12px;" asp-controller="Home" asp-action="Index">Back to Home</a>
                 </div>
                 <div class="col-12 col-md-6 pb-1">
                     <button type="submit" value="Add to Cart" class="btn btn-primary form-control" style="height:50px;">Add to Cart</button>

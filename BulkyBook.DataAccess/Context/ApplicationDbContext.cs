@@ -21,12 +21,17 @@ namespace BulkyBook.DataAccess.Context
 
         public DbSet<Company> Companies { get; set; }
 
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Product>().Property(p => p.ListPrice).HasColumnType("decimal(7,2)");
-            modelBuilder.Entity<Product>().Property(p => p.Price).HasColumnType("decimal(7,2)");
-            modelBuilder.Entity<Product>().Property(p => p.Price50).HasColumnType("decimal(7,2)");
-            modelBuilder.Entity<Product>().Property(p => p.Price100).HasColumnType("decimal(7,2)");
+            modelBuilder.Entity<Product>().Property(p => p.ListPrice).HasColumnType("decimal(12,2)");
+            modelBuilder.Entity<Product>().Property(p => p.Price).HasColumnType("decimal(12,2)");
+            modelBuilder.Entity<Product>().Property(p => p.Price50).HasColumnType("decimal(12,2)");
+            modelBuilder.Entity<Product>().Property(p => p.Price100).HasColumnType("decimal(12,2)");
+
+            modelBuilder.Entity<ShoppingCart>().Property(p => p.UnitPrice).HasColumnType("decimal(12,2)");
+            modelBuilder.Entity<ShoppingCart>().Property(p => p.FinalPrice).HasColumnType("decimal(12,2)");
 
             base.OnModelCreating(modelBuilder);
         }

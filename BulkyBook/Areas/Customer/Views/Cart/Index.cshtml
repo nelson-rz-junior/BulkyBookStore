@@ -1,0 +1,97 @@
+﻿@model BulkyBook.Models.ViewModels.ShoppingCartVM
+
+@{
+	ViewData["Title"] = "Shopping Cart";
+}
+
+<form method="post">
+	<div class="card container pt-4">
+		<div class="card-header bg-light text-light ml-0">
+			<div class="row">
+				<div class="col-6 pt-1 text-info">
+					<i class="fa fa-shopping-cart"></i> &nbsp; <strong>Shopping Cart</strong>
+				</div>
+				<div class="col-6 text-end">
+					<a asp-area="Customer" asp-controller="Home" asp-action="Index" class="btn btn-sm btn-success">Continue Shopping</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="card-body">
+			@if (!Model.Items.Any())
+			{
+				<div class="row">
+					<span class="text-center">No items found</span>
+				</div>
+			}
+			else
+			{
+				foreach(var item in Model.Items)
+				{
+					<div class="row">
+						<div class="d-none d-lg-block col-lg-1 text-center py-2">
+							@{
+								var image = Convert.ToBase64String(item.Product.Image);
+							}
+
+							<img src="data:image/jpeg;base64, @image" class="rounded" width="100" />
+						</div>
+						<div class="col-12 col-lg-6 pt-md-2">
+							<h5 class="m-2">
+								<strong>@item.Product.Title</strong>
+							</h5>
+							<p class="m-2">
+								<small>@Html.Raw(item.Product.Description)</small>
+							</p>
+						</div>
+						<div class="col-12 col-lg-5 text-center row">
+							<div class="col-4 text-md-right pt-4">
+								<h6>
+									<strong>
+										@item.UnitPrice.ToString("c")
+										<span class="text-muted">&nbsp;x&nbsp;</span>@item.Quantity
+									</strong>
+								</h6>
+							</div>
+							<div class="col-6 col-sm-4 col-lg-6 pt-2">
+								<div class="w-75 btn-group" role="group">
+									<a asp-action="Plus" asp-route-cartId="@item.Id" class="btn btn-primary">
+										<i class="bi bi-plus-square"></i>
+									</a> &nbsp;
+									<a asp-action="Minus" asp-route-cartId="@item.Id" class="btn btn-warning">
+										<i class="bi bi-dash-square"></i>
+									</a>
+								</div>
+							</div>
+							<div class="col-2 col-sm-4 col-lg-2 text-right pt-2">
+								<a asp-action="Remove" asp-route-cartId="@item.Id" class="btn btn-danger">
+									<i class="bi bi-trash-fill"></i>
+								</a>
+							</div>
+						</div>
+					</div>
+					<hr />
+				}
+
+				<div class="row">
+					<div class="col-12 col-md-6 offset-md-6 col-lg-4 offset-lg-8 pr-4 pb-3">
+						<ul class="list-group">
+							<li class="list-group-item d-flex justify-content-between bg-light">
+								<span class="text-info"> Total (BRL)</span>
+								<strong class="text-info">@Model.TotalPrice.ToString("c")</strong>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="card-footer">
+					<div class="card-footer row">
+						<div class="col-sm-12 col-lg-4 col-md-6 offset-lg-8 offset-md-6 ">
+							<a asp-action="Summary" class="btn btn-success form-control">Summary</a>
+						</div>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+</form>

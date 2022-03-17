@@ -4,6 +4,7 @@ using BulkyBook.DataAccess.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BulkyBook.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220316195811_AddShoppingCartPrices")]
+    partial class AddShoppingCartPrices
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -130,16 +132,16 @@ namespace BulkyBook.DataAccess.Migrations
                         .HasColumnType("varbinary(max)");
 
                     b.Property<decimal>("ListPrice")
-                        .HasColumnType("decimal(12,2)");
+                        .HasColumnType("decimal(7,2)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(12,2)");
+                        .HasColumnType("decimal(7,2)");
 
                     b.Property<decimal>("Price100")
-                        .HasColumnType("decimal(12,2)");
+                        .HasColumnType("decimal(7,2)");
 
                     b.Property<decimal>("Price50")
-                        .HasColumnType("decimal(12,2)");
+                        .HasColumnType("decimal(7,2)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -165,17 +167,17 @@ namespace BulkyBook.DataAccess.Migrations
                     b.Property<string>("ApplicationUserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<decimal>("FinalPrice")
-                        .HasColumnType("decimal(12,2)");
-
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(7,2)");
+
                     b.Property<decimal>("UnitPrice")
-                        .HasColumnType("decimal(12,2)");
+                        .HasColumnType("decimal(7,2)");
 
                     b.HasKey("Id");
 
