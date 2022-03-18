@@ -29,10 +29,11 @@ namespace BulkyBook.Areas.Customer.Controllers
 
             ShoppingCartVM = new()
             {
+                OrderHeader = new(),
                 Items = await _unitOfWork.ShoppingCartRepository.GetAllAsync(s => s.ApplicationUserId == claim.Value, includeProperties: "Product")
             };
 
-            ShoppingCartVM.TotalPrice = ShoppingCartVM.Items.Sum(s => s.FinalPrice);
+            ShoppingCartVM.OrderHeader.OrderTotal = ShoppingCartVM.Items.Sum(s => s.FinalPrice);
 
             return View(ShoppingCartVM);
         }
@@ -97,10 +98,19 @@ namespace BulkyBook.Areas.Customer.Controllers
 
             ShoppingCartVM = new()
             {
+                OrderHeader = new(),
                 Items = await _unitOfWork.ShoppingCartRepository.GetAllAsync(s => s.ApplicationUserId == claim.Value, includeProperties: "Product")
             };
 
-            ShoppingCartVM.TotalPrice = ShoppingCartVM.Items.Sum(s => s.FinalPrice);
+            ShoppingCartVM.OrderHeader.ApplicationUser = await _unitOfWork.ApplicationUserRepository.GetFirstOrDefaultAsync(u => u.Id == claim.Value);
+
+            ShoppingCartVM.OrderHeader.Name = ShoppingCartVM.OrderHeader.ApplicationUser.Name;
+            ShoppingCartVM.OrderHeader.StreetAddress = ShoppingCartVM.OrderHeader.ApplicationUser.StreetAddress;
+            ShoppingCartVM.OrderHeader.City = ShoppingCartVM.OrderHeader.ApplicationUser.City;
+            ShoppingCartVM.OrderHeader.State = ShoppingCartVM.OrderHeader.ApplicationUser.State;
+            ShoppingCartVM.OrderHeader.PostalCode = ShoppingCartVM.OrderHeader.ApplicationUser.PostalCode;
+            ShoppingCartVM.OrderHeader.PhoneNumber = ShoppingCartVM.OrderHeader.ApplicationUser.PhoneNumber;
+            ShoppingCartVM.OrderHeader.OrderTotal = ShoppingCartVM.Items.Sum(s => s.FinalPrice);
 
             return View(ShoppingCartVM);
         }

@@ -19,6 +19,10 @@ namespace BulkyBook.DataAccess.Repository
 
         public IApplicationUserRepository ApplicationUserRepository { get; set; }
 
+        public IOrderHeaderRepository OrderHeaderRepository { get; set; }
+
+        public IOrderDetailRepository OrderDetailRepository { get; set; }
+
         public UnitOfWork(ApplicationDbContext context)
         {
             _context = context;
@@ -29,6 +33,8 @@ namespace BulkyBook.DataAccess.Repository
             CompanyRepository = new CompanyRepository(_context);
             ShoppingCartRepository = new ShoppingCartRepository(_context);
             ApplicationUserRepository = new ApplicationUserRepository(_context);
+            OrderHeaderRepository = new OrderHeaderRepository(_context);
+            OrderDetailRepository = new OrderDetailRepository(_context);
         }
 
         public async Task SaveChangesAsync()
