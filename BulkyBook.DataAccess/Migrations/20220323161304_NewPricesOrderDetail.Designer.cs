@@ -4,6 +4,7 @@ using BulkyBook.DataAccess.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BulkyBook.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220323161304_NewPricesOrderDetail")]
+    partial class NewPricesOrderDetail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -163,10 +165,10 @@ namespace BulkyBook.DataAccess.Migrations
                     b.Property<decimal>("OrderTotal")
                         .HasColumnType("decimal(12,2)");
 
-                    b.Property<DateTime?>("PaymentDate")
+                    b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("PaymentDueDate")
+                    b.Property<DateTime>("PaymentDueDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentIntentId")
@@ -186,7 +188,7 @@ namespace BulkyBook.DataAccess.Migrations
                     b.Property<string>("SessionId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("ShippingDate")
+                    b.Property<DateTime>("ShippingDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("State")

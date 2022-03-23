@@ -39,7 +39,8 @@ namespace BulkyBook.DataAccess.Context
 
             modelBuilder.Entity<OrderHeader>().Property(p => p.OrderTotal).HasColumnType("decimal(12,2)");
 
-            modelBuilder.Entity<OrderDetail>().Property(p => p.Price).HasColumnType("decimal(12,2)");
+            modelBuilder.Entity<OrderDetail>().Property(p => p.UnitPrice).HasColumnType("decimal(12,2)");
+            modelBuilder.Entity<OrderDetail>().Property(p => p.FinalPrice).HasColumnType("decimal(12,2)");
 
             base.OnModelCreating(modelBuilder);
         }

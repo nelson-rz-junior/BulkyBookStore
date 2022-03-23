@@ -48,10 +48,10 @@ namespace BulkyBook.Models
 
         public string PaymentIntentId { get; set; }
 
-        public DateTime ShippingDate { get; set; }
+        public DateTime? ShippingDate { get; set; }
 
-        public DateTime PaymentDate { get; set; }
+        public DateTime? PaymentDate { get; set; }
 
-        public DateTime PaymentDueDate { get; set; }
+        public DateTime? PaymentDueDate { get; set; }
     }
 }
