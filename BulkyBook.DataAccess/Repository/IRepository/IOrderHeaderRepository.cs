@@ -8,5 +8,7 @@ namespace BulkyBook.DataAccess.Repository.IRepository
         void Update(OrderHeader orderHeader);
 
         Task UpdateStatus(int orderId, string orderStatus, string paymentStatus = null);
+
+        Task UpdateStripeSessionId(int orderId, string sessionId, string paymentIntentId);
     }
 }

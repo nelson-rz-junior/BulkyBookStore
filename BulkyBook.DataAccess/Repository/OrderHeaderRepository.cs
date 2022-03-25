@@ -33,5 +33,15 @@ namespace BulkyBook.DataAccess.Repository
                 }
             }
         }
+
+        public async Task UpdateStripeSessionId(int orderId, string sessionId, string paymentIntentId)
+        {
+            var orderHeader = await _context.OrderHeaders.FirstOrDefaultAsync(o => o.Id == orderId);
+            if (orderHeader != null)
+            {
+                orderHeader.SessionId = sessionId;
+                orderHeader.PaymentIntentId = paymentIntentId;
+            }
+        }
     }
 }

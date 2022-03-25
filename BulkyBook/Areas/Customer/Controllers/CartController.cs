@@ -5,6 +5,8 @@ using BulkyBook.Models.ViewModels;
 using BulkyBook.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Stripe.Checkout;
 using System.Security.Claims;
 
 namespace BulkyBook.Areas.Customer.Controllers
@@ -15,13 +17,15 @@ namespace BulkyBook.Areas.Customer.Controllers
     public class CartController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly StripeSettings _options;
 
         [BindProperty]
         public ShoppingCartVM ShoppingCartVM { get; set; }
 
-        public CartController(IUnitOfWork unitOfWork)
+        public CartController(IUnitOfWork unitOfWork, IOptions<StripeSettings> options)
         {
             _unitOfWork = unitOfWork;
+            _options = options.Value;
         }
 
         [HttpGet("Index")]
@@ -118,24 +122,16 @@ namespace BulkyBook.Areas.Customer.Controllers
         }
 
         [HttpPost]
+        [ActionName("Summary")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Summary(ShoppingCartVM shoppingCart)
+        public async Task<IActionResult> SummaryPost()
         {
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            var emailAddress = claimsIdentity.FindFirst(ClaimTypes.Email);
 
-            ShoppingCartVM = new()
-            {
-                OrderHeader = new(),
-                Items = await _unitOfWork.ShoppingCartRepository.GetAllAsync(s => s.ApplicationUserId == claim.Value, includeProperties: "Product")
-            };
+            ShoppingCartVM.Items = await _unitOfWork.ShoppingCartRepository.GetAllAsync(s => s.ApplicationUserId == claim.Value, includeProperties: "Product");
 
-            ShoppingCartVM.OrderHeader.Name = shoppingCart.OrderHeader.Name;
-            ShoppingCartVM.OrderHeader.StreetAddress = shoppingCart.OrderHeader.StreetAddress;
-            ShoppingCartVM.OrderHeader.City = shoppingCart.OrderHeader.City;
-            ShoppingCartVM.OrderHeader.State = shoppingCart.OrderHeader.State;
-            ShoppingCartVM.OrderHeader.PostalCode = shoppingCart.OrderHeader.PostalCode;
-            ShoppingCartVM.OrderHeader.PhoneNumber = shoppingCart.OrderHeader.PhoneNumber;
             ShoppingCartVM.OrderHeader.OrderTotal = ShoppingCartVM.Items.Sum(s => s.FinalPrice);
 
             ShoppingCartVM.OrderHeader.OrderStatus = SD.STATUS_PENDING;
@@ -145,6 +141,8 @@ namespace BulkyBook.Areas.Customer.Controllers
 
             await _unitOfWork.OrderHeaderRepository.AddAsync(ShoppingCartVM.OrderHeader);
             await _unitOfWork.SaveChangesAsync();
+
+            var lineItems = new List<SessionLineItemOptions>();
 
             foreach (var item in ShoppingCartVM.Items)
             {
@@ -157,15 +155,77 @@ namespace BulkyBook.Areas.Customer.Controllers
                     FinalPrice = item.FinalPrice
                 };
 
+                // Stripe item
+                lineItems.Add(new SessionLineItemOptions
+                {
+                    PriceData = new SessionLineItemPriceDataOptions
+                    {
+                        UnitAmount = (long)(item.UnitPrice * 100),
+                        Currency = "brl",
+                        ProductData = new SessionLineItemPriceDataProductDataOptions
+                        {
+                            Name = item.Product.Title,
+                            Description = $"{item.Product.Description.Substring(0, 100)}..."
+                        }
+                    },
+                    Quantity = item.Quantity
+                });
+
                 await _unitOfWork.OrderDetailRepository.AddAsync(orderDetail);
             }
 
             await _unitOfWork.SaveChangesAsync();
 
-            _unitOfWork.ShoppingCartRepository.RemoveRange(ShoppingCartVM.Items);
+            // Stripe session settings
+            var options = new SessionCreateOptions
+            {
+                CustomerEmail = emailAddress.Value,
+                LineItems = lineItems,
+                Mode = "payment",
+                SuccessUrl = $"{_options.SuccessUrl}/{ShoppingCartVM.OrderHeader.Id}",
+                CancelUrl = _options.CancelUrl
+            };
+
+            var service = new SessionService();
+            Session session = service.Create(options);
+
+            await _unitOfWork.OrderHeaderRepository.UpdateStripeSessionId(ShoppingCartVM.OrderHeader.Id, session.Id, session.PaymentIntentId);
             await _unitOfWork.SaveChangesAsync();
 
-            return RedirectToAction("Index", "Home");
+            Response.Headers.Add("Location", session.Url);
+
+            return new StatusCodeResult(303);
+        }
+
+        [HttpGet("OrderConfirmation/{id}")]
+        public async Task<IActionResult> OrderConfirmation(int id)
+        {
+            OrderHeader orderHeader = await _unitOfWork.OrderHeaderRepository.GetFirstOrDefaultAsync(o => o.Id == id);
+
+            OrderConfirmationVM orderConfirmationVM = new()
+            {
+                OrderHeader = orderHeader,
+                Items = await _unitOfWork.OrderDetailRepository.GetAllAsync(s => s.OrderHeaderId == orderHeader.Id, includeProperties: "Product")
+            };
+
+            var service = new SessionService();
+            Session session = service.Get(orderHeader.SessionId);
+
+            if (session.PaymentStatus.ToLower() == "paid")
+            {
+                await _unitOfWork.OrderHeaderRepository.UpdateStatus(id, SD.STATUS_APPROVED, SD.PAYMENT_STATUS_APPROVED);
+                await _unitOfWork.SaveChangesAsync();
+            }
+
+            // Clear the shopping cart
+            var items = await _unitOfWork.ShoppingCartRepository.GetAllAsync(s => s.ApplicationUserId == orderHeader.ApplicationUserId);
+            if (items.Any())
+            {
+                _unitOfWork.ShoppingCartRepository.RemoveRange(items);
+                await _unitOfWork.SaveChangesAsync();
+            }
+            
+            return View(orderConfirmationVM);
         }
     }
 }
