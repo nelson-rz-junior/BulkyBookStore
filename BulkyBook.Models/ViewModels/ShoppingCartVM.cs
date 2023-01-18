@@ -1,5 +1,4 @@
-﻿#nullable disable
-namespace BulkyBook.Models.ViewModels
+﻿namespace BulkyBook.Models.ViewModels
 {
     public class ShoppingCartVM
     {

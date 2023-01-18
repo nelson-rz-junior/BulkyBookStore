@@ -1,5 +1,4 @@
-﻿#nullable disable
-using BulkyBook.DataAccess.Context;
+﻿using BulkyBook.DataAccess.Context;
 using BulkyBook.DataAccess.Repository.IRepository;
 using BulkyBook.Models;
 using Microsoft.EntityFrameworkCore;
@@ -41,6 +40,7 @@ namespace BulkyBook.DataAccess.Repository
             {
                 orderHeader.SessionId = sessionId;
                 orderHeader.PaymentIntentId = paymentIntentId;
+                orderHeader.PaymentDate= DateTime.Now;
             }
         }
     }

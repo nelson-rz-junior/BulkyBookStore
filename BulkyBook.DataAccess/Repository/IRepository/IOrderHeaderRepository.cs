@@ -1,5 +1,4 @@
-﻿#nullable disable
-using BulkyBook.Models;
+﻿using BulkyBook.Models;
 
 namespace BulkyBook.DataAccess.Repository.IRepository
 {

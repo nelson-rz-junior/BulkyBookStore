@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-#nullable disable
-
 namespace BulkyBook.DataAccess.Migrations
 {
     public partial class AddCompany : Migration

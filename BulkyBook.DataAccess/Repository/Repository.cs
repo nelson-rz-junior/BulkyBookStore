@@ -1,5 +1,4 @@
-﻿#nullable disable
-using BulkyBook.DataAccess.Context;
+﻿using BulkyBook.DataAccess.Context;
 using BulkyBook.DataAccess.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -18,9 +17,14 @@ namespace BulkyBook.DataAccess.Repository
             dbSet = _context.Set<T>();
         }
 
-        public async Task<T> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter, string includeProperties = null)
+        public async Task<T> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter, string includeProperties = null, bool tracked = true)
         {
             IQueryable<T> query = dbSet;
+
+            if (!tracked)
+            {
+                query = query.AsNoTracking();
+            }
 
             if (includeProperties != null)
             {

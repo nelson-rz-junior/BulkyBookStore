@@ -1,6 +1,4 @@
-﻿#nullable disable
-
-namespace BulkyBook.Utility
+﻿namespace BulkyBook.Utility
 {
     public class StripeSettings
     {
@@ -10,6 +8,10 @@ namespace BulkyBook.Utility
 
         public string SuccessUrl { get; set; }
 
-        public string CancelUrl { get; set; }
-    }
+		public string PaymentConfirmationUrl { get; set; }
+
+		public string CancelUrl { get; set; }
+
+		public string PaymentCancelUrl { get; set; }
+	}
 }

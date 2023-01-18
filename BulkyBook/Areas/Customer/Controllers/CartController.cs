@@ -1,5 +1,4 @@
-﻿#nullable disable
-using BulkyBook.DataAccess.Repository.IRepository;
+﻿using BulkyBook.DataAccess.Repository.IRepository;
 using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
 using BulkyBook.Utility;
@@ -130,12 +129,24 @@ namespace BulkyBook.Areas.Customer.Controllers
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
             var emailAddress = claimsIdentity.FindFirst(ClaimTypes.Email);
 
+            ApplicationUser applicationUser = await _unitOfWork.ApplicationUserRepository.GetFirstOrDefaultAsync(u => u.Id == claim.Value);
+            bool isCustomerFlow = applicationUser.CompanyId.GetValueOrDefault() == 0;
+
             ShoppingCartVM.Items = await _unitOfWork.ShoppingCartRepository.GetAllAsync(s => s.ApplicationUserId == claim.Value, includeProperties: "Product");
 
             ShoppingCartVM.OrderHeader.OrderTotal = ShoppingCartVM.Items.Sum(s => s.FinalPrice);
 
-            ShoppingCartVM.OrderHeader.OrderStatus = SD.STATUS_PENDING;
-            ShoppingCartVM.OrderHeader.PaymentStatus = SD.PAYMENT_STATUS_PENDING;
+            if (isCustomerFlow)
+            {
+                ShoppingCartVM.OrderHeader.OrderStatus = SD.STATUS_PENDING;
+                ShoppingCartVM.OrderHeader.PaymentStatus = SD.PAYMENT_STATUS_PENDING;
+            }
+            else
+            {
+                ShoppingCartVM.OrderHeader.OrderStatus = SD.STATUS_APPROVED;
+                ShoppingCartVM.OrderHeader.PaymentStatus = SD.PAYMENT_STATUS_DELAYED;
+            }
+            
             ShoppingCartVM.OrderHeader.OrderDate = DateTime.Now;
             ShoppingCartVM.OrderHeader.ApplicationUserId = claim.Value;
 
@@ -155,46 +166,54 @@ namespace BulkyBook.Areas.Customer.Controllers
                     FinalPrice = item.FinalPrice
                 };
 
-                // Stripe item
-                lineItems.Add(new SessionLineItemOptions
+                if (isCustomerFlow)
                 {
-                    PriceData = new SessionLineItemPriceDataOptions
+                    // Stripe item
+                    lineItems.Add(new SessionLineItemOptions
                     {
-                        UnitAmount = (long)(item.UnitPrice * 100),
-                        Currency = "brl",
-                        ProductData = new SessionLineItemPriceDataProductDataOptions
+                        PriceData = new SessionLineItemPriceDataOptions
                         {
-                            Name = item.Product.Title,
-                            Description = $"{item.Product.Description.Substring(0, 100)}..."
-                        }
-                    },
-                    Quantity = item.Quantity
-                });
-
+                            UnitAmount = (long)(item.UnitPrice * 100),
+                            Currency = "brl",
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = item.Product.Title,
+                                Description = $"{item.Product.Description.Substring(0, 100)}..."
+                            }
+                        },
+                        Quantity = item.Quantity
+                    });
+                }
+                
                 await _unitOfWork.OrderDetailRepository.AddAsync(orderDetail);
             }
 
             await _unitOfWork.SaveChangesAsync();
 
-            // Stripe session settings
-            var options = new SessionCreateOptions
+            if (isCustomerFlow)
             {
-                CustomerEmail = emailAddress.Value,
-                LineItems = lineItems,
-                Mode = "payment",
-                SuccessUrl = $"{_options.SuccessUrl}/{ShoppingCartVM.OrderHeader.Id}",
-                CancelUrl = _options.CancelUrl
-            };
+                // Stripe session settings
+                var options = new SessionCreateOptions
+                {
+                    CustomerEmail = emailAddress.Value,
+                    LineItems = lineItems,
+                    Mode = "payment",
+                    SuccessUrl = $"{_options.SuccessUrl}/{ShoppingCartVM.OrderHeader.Id}",
+                    CancelUrl = _options.CancelUrl
+                };
 
-            var service = new SessionService();
-            Session session = service.Create(options);
+                var service = new SessionService();
+                Session session = service.Create(options);
 
-            await _unitOfWork.OrderHeaderRepository.UpdateStripeSessionId(ShoppingCartVM.OrderHeader.Id, session.Id, session.PaymentIntentId);
-            await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.OrderHeaderRepository.UpdateStripeSessionId(ShoppingCartVM.OrderHeader.Id, session.Id, session.PaymentIntentId);
+                await _unitOfWork.SaveChangesAsync();
 
-            Response.Headers.Add("Location", session.Url);
+                Response.Headers.Add("Location", session.Url);
 
-            return new StatusCodeResult(303);
+                return new StatusCodeResult(303);
+            }
+
+            return RedirectToAction("OrderConfirmation", "Cart", new { id = ShoppingCartVM.OrderHeader.Id });
         }
 
         [HttpGet("OrderConfirmation/{id}")]
@@ -208,13 +227,16 @@ namespace BulkyBook.Areas.Customer.Controllers
                 Items = await _unitOfWork.OrderDetailRepository.GetAllAsync(s => s.OrderHeaderId == orderHeader.Id, includeProperties: "Product")
             };
 
-            var service = new SessionService();
-            Session session = service.Get(orderHeader.SessionId);
-
-            if (session.PaymentStatus.ToLower() == "paid")
+            if (orderHeader.PaymentStatus != SD.PAYMENT_STATUS_DELAYED)
             {
-                await _unitOfWork.OrderHeaderRepository.UpdateStatus(id, SD.STATUS_APPROVED, SD.PAYMENT_STATUS_APPROVED);
-                await _unitOfWork.SaveChangesAsync();
+                var service = new SessionService();
+                Session session = service.Get(orderHeader.SessionId);
+
+                if (session.PaymentStatus.ToLower() == "paid")
+                {
+                    await _unitOfWork.OrderHeaderRepository.UpdateStatus(id, SD.STATUS_APPROVED, SD.PAYMENT_STATUS_APPROVED);
+                    await _unitOfWork.SaveChangesAsync();
+                }
             }
 
             // Clear the shopping cart

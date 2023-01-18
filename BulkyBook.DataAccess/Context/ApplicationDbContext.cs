@@ -1,5 +1,4 @@
-﻿#nullable disable
-using BulkyBook.Models;
+﻿using BulkyBook.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
