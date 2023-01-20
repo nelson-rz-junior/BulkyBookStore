@@ -66,14 +66,6 @@ public class RegisterModel : PageModel
 
     public async Task OnGetAsync(string returnUrl = null)
     {
-        if (!await _roleManager.RoleExistsAsync(SD.ROLE_USER_ADMIN))
-        {
-            await _roleManager.CreateAsync(new IdentityRole(SD.ROLE_USER_ADMIN));
-            await _roleManager.CreateAsync(new IdentityRole(SD.ROLE_USER_COMPANY));
-            await _roleManager.CreateAsync(new IdentityRole(SD.ROLE_USER_EMPLOYEE));
-            await _roleManager.CreateAsync(new IdentityRole(SD.ROLE_USER_INDIVIDUAL));
-        }
-
         ReturnUrl = returnUrl;
         ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
