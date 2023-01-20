@@ -18,5 +18,7 @@
         public const string PAYMENT_STATUS_APPROVED = "Approved";
         public const string PAYMENT_STATUS_DELAYED = "ApprovedForDelayed";
         public const string PAYMENT_STATUS_REJECTED = "Rejected";
+
+        public const string SESSION_CART = "SessionShoppingCart";
     }
 }

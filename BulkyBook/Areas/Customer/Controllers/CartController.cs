@@ -16,14 +16,16 @@ namespace BulkyBook.Areas.Customer.Controllers
     public class CartController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IEmailSender _emailSender;
         private readonly StripeSettings _options;
 
         [BindProperty]
         public ShoppingCartVM ShoppingCartVM { get; set; }
 
-        public CartController(IUnitOfWork unitOfWork, IOptions<StripeSettings> options)
+        public CartController(IUnitOfWork unitOfWork, IEmailSender emailSender, IOptions<StripeSettings> options)
         {
             _unitOfWork = unitOfWork;
+            _emailSender = emailSender;
             _options = options.Value;
         }
 
@@ -40,6 +42,8 @@ namespace BulkyBook.Areas.Customer.Controllers
             };
 
             ShoppingCartVM.OrderHeader.OrderTotal = ShoppingCartVM.Items.Sum(s => s.FinalPrice);
+
+            HttpContext.Session.SetInt32(SD.SESSION_CART, ShoppingCartVM.Items.Sum(s => s.Quantity));
 
             return View(ShoppingCartVM);
         }
@@ -219,7 +223,7 @@ namespace BulkyBook.Areas.Customer.Controllers
         [HttpGet("OrderConfirmation/{id}")]
         public async Task<IActionResult> OrderConfirmation(int id)
         {
-            OrderHeader orderHeader = await _unitOfWork.OrderHeaderRepository.GetFirstOrDefaultAsync(o => o.Id == id);
+            OrderHeader orderHeader = await _unitOfWork.OrderHeaderRepository.GetFirstOrDefaultAsync(o => o.Id == id, includeProperties: "ApplicationUser");
 
             OrderConfirmationVM orderConfirmationVM = new()
             {
@@ -246,7 +250,14 @@ namespace BulkyBook.Areas.Customer.Controllers
                 _unitOfWork.ShoppingCartRepository.RemoveRange(items);
                 await _unitOfWork.SaveChangesAsync();
             }
-            
+
+            HttpContext.Session.Remove(SD.SESSION_CART);
+
+            await _emailSender.SendEmailAsync(orderConfirmationVM.OrderHeader.Name, 
+                orderConfirmationVM.OrderHeader.ApplicationUser.Email, 
+                "Order Confirmation - Bulky Book Store Ltda.", 
+                $"Congratulations, your order was placed!");
+
             return View(orderConfirmationVM);
         }
     }
