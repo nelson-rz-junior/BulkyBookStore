@@ -4,6 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BulkyBook.DataAccess.Context
 {
+    // MIGRATIONS
+    // cd .\BulkyBook.DataAccess
+    // dotnet ef migrations add InitialConfiguration --context ApplicationDbContext --startup-project D:\Projects\BulkyBookStore\BulkyBook\BulkyBook.csproj
+    // dotnet ef database update --context ApplicationDbContext --startup-project D:\Projects\BulkyBookStore\BulkyBook\BulkyBook.csproj
+
     public class ApplicationDbContext : IdentityDbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
